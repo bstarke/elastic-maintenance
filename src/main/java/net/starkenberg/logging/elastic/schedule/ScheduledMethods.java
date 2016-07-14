@@ -1,7 +1,7 @@
 package net.starkenberg.logging.elastic.schedule;
 
-import java.text.SimpleDateFormat;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -29,21 +29,25 @@ public class ScheduledMethods {
 	private Integer logDays;
 	@Value("${app.repo.log.index.prefix}")
 	private String logIndexPrefix;
-	@Value("${app.repo.log.index.date.format}")
-	private SimpleDateFormat dateFormat;
+	private DateTimeFormatter dateFormat;
 	@Value("${app.repo.log.host}")
 	private String host;
 	@Value("${app.repo.log.port}")
 	private Integer port;
 	private static final Logger log = LoggerFactory.getLogger(ScheduledMethods.class);
 
+	@Autowired
+	public ScheduledMethods(@Value("${app.repo.log.index.date.format}") String format) {
+		this.dateFormat = DateTimeFormatter.ofPattern(format);
+	}
+	
 	/**
 	 * create the index for tomorrow so elasticsearch isn't creating the 
 	 * index while also trying to index documents into that index
 	 */
-	@Scheduled(cron = "30 21 19 * * *")
+	@Scheduled(cron = "30 0 10 * * *")
 	public void createTomorrowsIndex() {
-		String date = dateFormat.format(LocalDate.now().plusDays(1));
+		String date = LocalDate.now().plusDays(1).format(dateFormat);
 		log.info(String.format("Creating Index: %s%s", logIndexPrefix, date));
 		restTemplate.postForLocation(String.format("http://%s:%s/%s%s", host, port, logIndexPrefix, date), null);
 	}
@@ -51,7 +55,7 @@ public class ScheduledMethods {
 	/**
 	 * delete old and unwanted indices
 	 */
-	@Scheduled(cron = "0 */3 * * * *")
+	@Scheduled(cron = "15 10 8 * * *")
 	public void deleteIndices() {
 		List<String> indices = getIndicesToDelete();
 		for (String index : indices) {
@@ -93,10 +97,10 @@ public class ScheduledMethods {
 	private List<String> getIndicesToDelete() {
 		List<String> indices = getAllIndices();
 		//remove tomorrows index if it has been created early
-		indices.remove(String.format("%s%s", logIndexPrefix, dateFormat.format(LocalDate.now().plusDays(1))));
+		indices.remove(String.format("%s%s", logIndexPrefix, LocalDate.now().plusDays(1).format(dateFormat)));
 		//remove the indices to keep
 		for (int i = 0; i < logDays; i++) {
-			indices.remove(String.format("%s%s", logIndexPrefix, dateFormat.format(LocalDate.now().minusDays(i))));
+			indices.remove(String.format("%s%s", logIndexPrefix, LocalDate.now().minusDays(i).format(dateFormat)));
 		}
 		return indices;
 	}
