@@ -1,5 +1,6 @@
 package net.starkenberg.logging.elastic.schedule;
 
+import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -28,6 +29,8 @@ public class ScheduledMethods {
 	private Integer logDays;
 	@Value("${app.repo.log.index.prefix}")
 	private String logIndexPrefix;
+	@Value("${app.repo.log.index.date.format}")
+	private SimpleDateFormat dateFormat;
 	@Value("${app.repo.log.host}")
 	private String host;
 	@Value("${app.repo.log.port}")
@@ -40,15 +43,15 @@ public class ScheduledMethods {
 	 */
 	@Scheduled(cron = "30 21 19 * * *")
 	public void createTomorrowsIndex() {
-		LocalDate date = LocalDate.now().plusDays(1);
-		log.info(String.format("Creating Index: logs-%s", date));
+		String date = dateFormat.format(LocalDate.now().plusDays(1));
+		log.info(String.format("Creating Index: %s%s", logIndexPrefix, date));
 		restTemplate.postForLocation(String.format("http://%s:%s/%s%s", host, port, logIndexPrefix, date), null);
 	}
 
 	/**
 	 * delete old and unwanted indices
 	 */
-	@Scheduled(cron = "0 */5 * * * *")
+	@Scheduled(cron = "0 */3 * * * *")
 	public void deleteIndices() {
 		List<String> indices = getIndicesToDelete();
 		for (String index : indices) {
@@ -73,9 +76,14 @@ public class ScheduledMethods {
 	 * @return List of all indices in the cluster
 	 */
 	private List<String> getAllIndices() {
-		String indexString = restTemplate.getForObject(String.format("http://%s:%s/_cat/indices/%s?h=index", host, port, logIndexPrefix),
-				String.class);
-		String[] indexArray = indexString.split("\n");
+		String url = String.format("http://%s:%s/_cat/indices/%s*?h=index", host, port, logIndexPrefix);
+		String indexString = "";
+		try {
+			indexString = restTemplate.getForObject(url, String.class);
+		} catch (RestClientException e) {
+			log.error(String.format("Error fetching indices from %s : %s", url, e.getLocalizedMessage()), e);
+		}
+		String[] indexArray = indexString.replaceAll(" ", "").split("\n");
 		return new ArrayList<String>(Arrays.asList(indexArray));
 	}
 
@@ -85,10 +93,10 @@ public class ScheduledMethods {
 	private List<String> getIndicesToDelete() {
 		List<String> indices = getAllIndices();
 		//remove tomorrows index if it has been created early
-		indices.remove(String.format("%s%s", logIndexPrefix, LocalDate.now().plusDays(1)));
+		indices.remove(String.format("%s%s", logIndexPrefix, dateFormat.format(LocalDate.now().plusDays(1))));
 		//remove the indices to keep
 		for (int i = 0; i < logDays; i++) {
-			indices.remove(String.format("%s%s", logIndexPrefix, LocalDate.now().minusDays(i)));
+			indices.remove(String.format("%s%s", logIndexPrefix, dateFormat.format(LocalDate.now().minusDays(i))));
 		}
 		return indices;
 	}
