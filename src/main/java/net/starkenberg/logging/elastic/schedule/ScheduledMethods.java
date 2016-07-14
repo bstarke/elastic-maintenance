@@ -2,6 +2,7 @@ package net.starkenberg.logging.elastic.schedule;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -60,7 +61,7 @@ public class ScheduledMethods {
 	}
 
 	/**
-	 * pretty self explanatory
+	 * Delete the index passed in
 	 * @param indexToDelete
 	 * @throws RestClientException
 	 */
@@ -72,14 +73,10 @@ public class ScheduledMethods {
 	 * @return List of all indices in the cluster
 	 */
 	private List<String> getAllIndices() {
-		String indexString = restTemplate.getForObject(String.format("http://%s:%s/_cat/indices?h=index", host, port),
+		String indexString = restTemplate.getForObject(String.format("http://%s:%s/_cat/indices/%s?h=index", host, port, logIndexPrefix),
 				String.class);
 		String[] indexArray = indexString.split("\n");
-		List<String> indexList = new ArrayList<String>();
-		for (int i = 0; i < indexArray.length; i++) {
-			indexList.add(indexArray[i].trim());
-		}
-		return indexList;
+		return new ArrayList<String>(Arrays.asList(indexArray));
 	}
 
 	/**
@@ -87,9 +84,6 @@ public class ScheduledMethods {
 	 */
 	private List<String> getIndicesToDelete() {
 		List<String> indices = getAllIndices();
-		//remove the Kibana indices to keep from deleting them
-		indices.remove("kibana-int");
-		indices.remove(".kibana");
 		//remove tomorrows index if it has been created early
 		indices.remove(String.format("%s%s", logIndexPrefix, LocalDate.now().plusDays(1)));
 		//remove the indices to keep
