@@ -45,7 +45,7 @@ public class ScheduledMethods {
 	 * create the index for tomorrow so elasticsearch isn't creating the 
 	 * index while also trying to index documents into that index
 	 */
-	@Scheduled(cron = "30 0 10 * * *")
+	@Scheduled(cron = "30 15 21 * * *")
 	public void createTomorrowsIndex() {
 		String date = LocalDate.now().plusDays(1).format(dateFormat);
 		log.info(String.format("Creating Index: %s%s", logIndexPrefix, date));
