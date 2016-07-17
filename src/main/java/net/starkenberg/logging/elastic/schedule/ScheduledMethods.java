@@ -45,7 +45,7 @@ public class ScheduledMethods {
 	 * create the index for tomorrow so elasticsearch isn't creating the 
 	 * index while also trying to index documents into that index
 	 */
-	@Scheduled(cron = "30 15 21 * * *")
+	@Scheduled(cron = "${app.repo.log.create.cron.expression}")
 	public void createTomorrowsIndex() {
 		String date = LocalDate.now().plusDays(1).format(dateFormat);
 		log.info(String.format("Creating Index: %s%s", logIndexPrefix, date));
@@ -55,7 +55,7 @@ public class ScheduledMethods {
 	/**
 	 * delete old and unwanted indices
 	 */
-	@Scheduled(cron = "15 10 8 * * *")
+	@Scheduled(cron = "${app.repo.log.delete.cron.expression}")
 	public void deleteIndices() {
 		List<String> indices = getIndicesToDelete();
 		for (String index : indices) {
