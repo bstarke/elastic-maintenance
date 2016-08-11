@@ -1,0 +1,5 @@
+---
+applications:
+- name: esmaint
+  memory: 512M
+  domain: u1.app.cloud.comcast.net

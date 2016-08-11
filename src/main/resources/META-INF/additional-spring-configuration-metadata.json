@@ -1,0 +1,32 @@
+{"properties": [
+  {
+    "name": "app.repo.log.days",
+    "type": "java.lang.String",
+    "description": "A description for 'app.repo.log.days'"
+  },
+  {
+    "name": "app.repo.log.host",
+    "type": "java.lang.String",
+    "description": "A description for 'app.repo.log.host'"
+  },
+  {
+    "name": "app.repo.log.port",
+    "type": "java.lang.String",
+    "description": "A description for 'app.repo.log.port'"
+  },
+  {
+    "name": "app.repo.log.indexDateFormat",
+    "type": "java.lang.String",
+    "description": "A description for 'app.repo.log.indexDateFormat'"
+  },
+  {
+    "name": "app.repo.log.deleteCronExpression",
+    "type": "java.lang.String",
+    "description": "A description for 'app.repo.log.deleteCronExpression'"
+  },
+  {
+    "name": "app.repo.log.createCronExpression",
+    "type": "java.lang.String",
+    "description": "A description for 'app.repo.log.createCronExpression'"
+  }
+]}
