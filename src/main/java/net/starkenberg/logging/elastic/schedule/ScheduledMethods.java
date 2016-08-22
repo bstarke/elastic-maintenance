@@ -76,7 +76,7 @@ public class ScheduledMethods {
 	 * @param indexToDelete
 	 * @throws RestClientException
 	 */
-	private void deleteAnIndex(String indexToDelete) throws RestClientException {
+	public void deleteAnIndex(String indexToDelete) throws RestClientException {
 		log.info(String.format("DELETE : http://%s:%s/%s", config.getHost(), config.getPort(), indexToDelete));
 		restTemplate.delete(String.format("http://%s:%s/%s", config.getHost(), config.getPort(), indexToDelete));
 	}
@@ -106,7 +106,7 @@ public class ScheduledMethods {
 	/**
 	 * @return list of indices that we don't want in the cluster
 	 */
-	private List<String> getIndicesToDelete() {
+	public List<String> getIndicesToDelete() {
 		List<String> indices = getAllIndices();
 		// remove tomorrows index if it has been created early
 		for (String logIndexPrefix : config.getIndexPrefixs()) {
