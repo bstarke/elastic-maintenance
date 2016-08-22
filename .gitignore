@@ -10,5 +10,5 @@ buildNumber.properties
 .settings/
 .classpath
 .project
-
+.factorypath
 /.apt_generated/
