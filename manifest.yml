@@ -1,5 +1,8 @@
 ---
 applications:
 - name: esmaint
-  memory: 512M
-  domain: u1.app.cloud.comcast.net
+  memory: 384M
+  buildpack: java_buildpack  
+  domain: local2.pcfdev.io
+  services:
+    - logstash-drain  
