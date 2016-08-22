@@ -1,30 +1,35 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration>
-    <include resource="org/springframework/boot/logging/logback/base.xml"/>
+
+    <include resource="org/springframework/boot/logging/logback/default.xml"/>
 
 	<springProperty scope="context" name="springAppName" source="spring.application.name" />
-	<springProfile name="cloud">
+
+	<springProfile name="default">
 		<appender name="console" class="ch.qos.logback.core.ConsoleAppender">
 			<encoder class="net.logstash.logback.encoder.LoggingEventCompositeJsonEncoder">
 				<providers>
 					<timestamp>
 						<timeZone>UTC</timeZone>
 					</timestamp>
-					<pattern>
+					<logLevel />
+ 					<pattern>
 						<pattern>
 							{
-							"severity": "%level",
 							"service": "${springAppName:-}",
 							"trace": "%X{X-B3-TraceId:-}",
 							"span": "%X{X-B3-SpanId:-}",
 							"exportable": "%X{X-Span-Export:-}",
-							"pid": "${PID:-}",
-							"thread": "%thread",
-							"class": "%logger{40}",
-							"@message": "%message"
+							"pid": "${PID:-}"
 							}
 						</pattern>
 					</pattern>
+					<threadName />
+					<loggerName />
+					<mdc />
+					<message>
+						<fieldName>@message</fieldName>
+					</message>
 				</providers>
 			</encoder>
 		</appender>
