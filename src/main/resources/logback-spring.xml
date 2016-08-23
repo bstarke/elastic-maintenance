@@ -1,11 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration>
 
-    <include resource="org/springframework/boot/logging/logback/default.xml"/>
-
 	<springProperty scope="context" name="springAppName" source="spring.application.name" />
 
-	<springProfile name="default">
+	<springProfile name="cloud">
+	    <include resource="org/springframework/boot/logging/logback/defaults.xml"/>
 		<appender name="console" class="ch.qos.logback.core.ConsoleAppender">
 			<encoder class="net.logstash.logback.encoder.LoggingEventCompositeJsonEncoder">
 				<providers>
@@ -37,5 +36,7 @@
 	        <appender-ref ref="console" />
 	    </root>
 	</springProfile>
-    
+	<springProfile name="default, local">
+		<include resource="org/springframework/boot/logging/logback/base.xml"/>
+	</springProfile>    
 </configuration>
