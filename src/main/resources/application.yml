@@ -17,8 +17,8 @@ logging:
 app:
   repo:
     log:
-      days: 7	
-      host: "server"
+      days: 14
+      host: "host2.pcfdev.io"
       port: 9200
       indexPrefixs: "logstash-"
       indexDateFormat: "yyyy.MM.dd"
