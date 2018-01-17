@@ -2,7 +2,9 @@
 applications:
 - name: esmaint
   memory: 384M
-  buildpack: java_buildpack  
-  domain: local2.pcfdev.io
-  services:
-    - logstash-drain  
+  domain: local.pcfdev.io
+  path: target/elastic-maintenance-1.0.0-snapshot.jar
+  buildpack: https://github.com/cloudfoundry/java-buildpack
+  env:
+      JBP_CONFIG_OPEN_JDK_JRE: '[memory_calculator: {stack_threads: 100}]'
+      JAVA_OPTS: '-XX:ReservedCodeCacheSize=140m -XX:MaxMetaspaceSize=64m'
